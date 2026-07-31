@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 #
-# cpolar-tunnels - fetch cpolar tunnel information
+# cpolar-status - fetch cpolar tunnel information
 #
 # Requires: bash, curl, jq, gettext
 #
 # Usage:
-#   cpolar-tunnels [options]
+#   cpolar-status [options]
 #
 # Options:
 #   --username <user>    login username (required)
@@ -15,13 +15,13 @@
 #   --json               output raw JSON
 #   -h, --help           show this help
 #
-# i18n: uses gettext with TEXTDOMAIN=cpolar-tunnels. Language is chosen from
+# i18n: uses gettext with TEXTDOMAIN=cpolar-status. Language is chosen from
 # LANG/LC_ALL/LC_MESSAGES; English is the fallback when no catalog matches.
 #
 set -euo pipefail
 
 # i18n setup ---------------------------------------------------------------
-export TEXTDOMAIN="${TEXTDOMAIN:-cpolar-tunnels}"
+export TEXTDOMAIN="${TEXTDOMAIN:-cpolar-status}"
 if [[ -z "${TEXTDOMAINDIR:-}" ]]; then
   local_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/share/locale"
   [[ -d "$local_dir" ]] && export TEXTDOMAINDIR="$local_dir"
@@ -33,7 +33,7 @@ CPOLAR_BASEURL="http://127.0.0.1:9200"
 # ==================================================
 
 usage() {
-  printf '%s\n' "$(_ 'Usage: cpolar-tunnels [options]
+  printf '%s\n' "$(_ 'Usage: cpolar-status [options]
 
 Options:
   --username <user>    login username (required)
@@ -44,10 +44,10 @@ Options:
   -h, --help           show this help
 
 Examples:
-  cpolar-tunnels --username user@example.com --password xxxx
-  cpolar-tunnels --username user@example.com --password xxxx --filter ssh
-  cpolar-tunnels --username user@example.com --password xxxx --filter ssh --json
-  cpolar-tunnels --username user@example.com --password xxxx --json
+  cpolar-status --username user@example.com --password xxxx
+  cpolar-status --username user@example.com --password xxxx --filter ssh
+  cpolar-status --username user@example.com --password xxxx --filter ssh --json
+  cpolar-status --username user@example.com --password xxxx --json
 ')"
 }
 

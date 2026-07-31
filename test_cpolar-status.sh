@@ -1,16 +1,16 @@
 #!/usr/bin/env bash
 #
-# test_cpolar_tunnels.sh - cpolar_tunnels.sh 的测试用例
+# test_cpolar-status.sh - cpolar-status.sh 的测试用例
 #
 # 运行（用户名/密码通过环境变量传入，不写入脚本）:
-#   CPOLAR_USERNAME=xxx CPOLAR_PASSWORD=xxx ./test_cpolar_tunnels.sh
+#   CPOLAR_USERNAME=xxx CPOLAR_PASSWORD=xxx ./test_cpolar-status.sh
 #
 # 依赖 gettext/msgfmt（在 devShell 中运行: nix develop）和 zh_CN locale。
 # 测试默认在 zh_CN.UTF-8 下断言中文输出。
 #
 set -uo pipefail
 
-SCRIPT="$(cd "$(dirname "$0")" && pwd)/cpolar_tunnels.sh"
+SCRIPT="$(cd "$(dirname "$0")" && pwd)/cpolar-status.sh"
 REPO="$(cd "$(dirname "$0")" && pwd)"
 OUT="$(mktemp)"
 PASS=0
@@ -31,7 +31,7 @@ for _cmd in gettext msgfmt; do
 done
 MO_DIR="$REPO/share/locale/zh_CN/LC_MESSAGES"
 mkdir -p "$MO_DIR"
-msgfmt -o "$MO_DIR/cpolar-tunnels.mo" "$REPO/po/zh_CN.po"
+msgfmt -o "$MO_DIR/cpolar-status.mo" "$REPO/po/zh_CN.po"
 export LANG=zh_CN.UTF-8
 export LC_ALL=zh_CN.UTF-8
 
@@ -177,7 +177,7 @@ assert_contains "T13 英文错误" "$(cat "$OUT")" "error: unknown option"
 echo "===== T14 中文帮助（zh_CN.UTF-8）====="
 "$SCRIPT" --help >"$OUT" 2>&1
 assert_exit "T14 退出码=0" 0 $?
-assert_contains "T14 中文用法" "$(cat "$OUT")" "用法: cpolar-tunnels"
+assert_contains "T14 中文用法" "$(cat "$OUT")" "用法: cpolar-status"
 
 rm -f "$OUT"
 echo

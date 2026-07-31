@@ -17,7 +17,7 @@
         in
         {
           default = pkgs.stdenv.mkDerivation {
-            pname = "cpolar-tunnels";
+            pname = "cpolar-status";
             version = "0.1.0";
             src = self;
 
@@ -27,10 +27,10 @@
             installPhase = ''
               runHook preInstall
               mkdir -p $out/bin $out/share/locale/zh_CN/LC_MESSAGES
-              install -m755 cpolar_tunnels.sh $out/bin/cpolar-tunnels
-              msgfmt po/zh_CN.po -o $out/share/locale/zh_CN/LC_MESSAGES/cpolar-tunnels.mo
-              wrapProgram $out/bin/cpolar-tunnels \
-                --set TEXTDOMAIN cpolar-tunnels \
+              install -m755 cpolar-status.sh $out/bin/cpolar-status
+              msgfmt po/zh_CN.po -o $out/share/locale/zh_CN/LC_MESSAGES/cpolar-status.mo
+              wrapProgram $out/bin/cpolar-status \
+                --set TEXTDOMAIN cpolar-status \
                 --set TEXTDOMAINDIR $out/share/locale \
                 --prefix PATH : ${pkgs.lib.makeBinPath [ pkgs.bash pkgs.jq pkgs.curl pkgs.gettext ]}
               runHook postInstall

@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 #
-# demo_cpolar_tunnels.sh - 展示 cpolar_tunnels.sh 各指令及执行结果
+# demo_cpolar-status.sh - 展示 cpolar-status.sh 各指令及执行结果
 #
 # 运行（用户名/密码通过环境变量传入，不写入脚本）:
-#   CPOLAR_USERNAME=xxx CPOLAR_PASSWORD=xxx ./demo_cpolar_tunnels.sh
+#   CPOLAR_USERNAME=xxx CPOLAR_PASSWORD=xxx ./demo_cpolar-status.sh
 #
 set -uo pipefail
 
-SCRIPT="$(cd "$(dirname "$0")" && pwd)/cpolar_tunnels.sh"
+SCRIPT="$(cd "$(dirname "$0")" && pwd)/cpolar-status.sh"
 
 if [[ -z "${CPOLAR_USERNAME:-}" || -z "${CPOLAR_PASSWORD:-}" ]]; then
   echo "错误: 需要设置环境变量 CPOLAR_USERNAME 和 CPOLAR_PASSWORD" >&2
