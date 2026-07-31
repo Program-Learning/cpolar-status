@@ -21,15 +21,18 @@
             version = "0.1.0";
             src = self;
 
-            nativeBuildInputs = [ pkgs.makeWrapper ];
-            buildInputs = [ pkgs.bash pkgs.jq pkgs.curl ];
+            nativeBuildInputs = [ pkgs.makeWrapper pkgs.gettext ];
+            buildInputs = [ pkgs.bash pkgs.jq pkgs.curl pkgs.gettext ];
 
             installPhase = ''
               runHook preInstall
-              mkdir -p $out/bin
+              mkdir -p $out/bin $out/share/locale/zh_CN/LC_MESSAGES
               install -m755 cpolar_tunnels.sh $out/bin/cpolar-tunnels
+              msgfmt po/zh_CN.po -o $out/share/locale/zh_CN/LC_MESSAGES/cpolar-tunnels.mo
               wrapProgram $out/bin/cpolar-tunnels \
-                --prefix PATH : ${pkgs.lib.makeBinPath [ pkgs.bash pkgs.jq pkgs.curl ]}
+                --set TEXTDOMAIN cpolar-tunnels \
+                --set TEXTDOMAINDIR $out/share/locale \
+                --prefix PATH : ${pkgs.lib.makeBinPath [ pkgs.bash pkgs.jq pkgs.curl pkgs.gettext ]}
               runHook postInstall
             '';
           };
@@ -41,7 +44,7 @@
         in
         {
           default = pkgs.mkShell {
-            packages = [ pkgs.jq pkgs.curl ];
+            packages = [ pkgs.jq pkgs.curl pkgs.gettext ];
           };
         });
     };

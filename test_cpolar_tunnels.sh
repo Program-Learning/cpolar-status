@@ -5,9 +5,13 @@
 # 运行（用户名/密码通过环境变量传入，不写入脚本）:
 #   CPOLAR_USERNAME=xxx CPOLAR_PASSWORD=xxx ./test_cpolar_tunnels.sh
 #
+# 依赖 gettext/msgfmt（在 devShell 中运行: nix develop）和 zh_CN locale。
+# 测试默认在 zh_CN.UTF-8 下断言中文输出。
+#
 set -uo pipefail
 
 SCRIPT="$(cd "$(dirname "$0")" && pwd)/cpolar_tunnels.sh"
+REPO="$(cd "$(dirname "$0")" && pwd)"
 OUT="$(mktemp)"
 PASS=0
 FAIL=0
@@ -17,6 +21,19 @@ if [[ -z "${CPOLAR_USERNAME:-}" || -z "${CPOLAR_PASSWORD:-}" ]]; then
   exit 1
 fi
 CREDS=(--username "$CPOLAR_USERNAME" --password "$CPOLAR_PASSWORD")
+
+# i18n 准备：用 msgfmt 从 po/ 编译 zh 目录，供脚本的开发环境回退路径使用
+for _cmd in gettext msgfmt; do
+  command -v "$_cmd" >/dev/null || {
+    echo "错误: 需要 $_cmd，请在 devShell 中运行（nix develop）" >&2
+    exit 1
+  }
+done
+MO_DIR="$REPO/share/locale/zh_CN/LC_MESSAGES"
+mkdir -p "$MO_DIR"
+msgfmt -o "$MO_DIR/cpolar-tunnels.mo" "$REPO/po/zh_CN.po"
+export LANG=zh_CN.UTF-8
+export LC_ALL=zh_CN.UTF-8
 
 assert_contains() { # 名称, 内容, 期望子串
   if grep -qF "$3" <<<"$2"; then
@@ -151,6 +168,16 @@ echo "===== T12 --baseurl 指向面板基址 ====="
 "$SCRIPT" "${CREDS[@]}" --baseurl http://127.0.0.1:9200 --filter admin >"$OUT" 2>&1
 assert_exit "T12 退出码=0" 0 $?
 assert_contains "T12 包含 admin" "$(cat "$OUT")" "admin"
+
+echo "===== T13 默认英文回退（LC_ALL=C），错误应为英文 ====="
+env -u LANG LC_ALL=C "$SCRIPT" --badarg >"$OUT" 2>&1
+assert_exit "T13 退出码=1" 1 $?
+assert_contains "T13 英文错误" "$(cat "$OUT")" "error: unknown option"
+
+echo "===== T14 中文帮助（zh_CN.UTF-8）====="
+"$SCRIPT" --help >"$OUT" 2>&1
+assert_exit "T14 退出码=0" 0 $?
+assert_contains "T14 中文用法" "$(cat "$OUT")" "用法: cpolar-tunnels"
 
 rm -f "$OUT"
 echo

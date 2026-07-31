@@ -1,0 +1,28 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: cpolar-tunnels 0.1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-07-31 00:00+0000\n"
+"PO-Revision-Date: 2026-07-31 00:00+0800\n"
+"Last-Translator: nixos <mayurinfc@outlook.com>\n"
+"Language-Team: Chinese (Simplified)\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+msgid "Usage: cpolar-tunnels [options]\n\nOptions:\n  --username <user>    login username (required)\n  --password <pass>    login password (required)\n  --baseurl <url>      dashboard base URL (optional, default http://127.0.0.1:9200)\n  --filter <name>      only show the named tunnel (e.g. ssh)\n  --json               output raw JSON\n  -h, --help           show this help\n\nExamples:\n  cpolar-tunnels --username user@example.com --password xxxx\n  cpolar-tunnels --username user@example.com --password xxxx --filter ssh\n  cpolar-tunnels --username user@example.com --password xxxx --filter ssh --json\n  cpolar-tunnels --username user@example.com --password xxxx --json\n"
+msgstr "用法: cpolar-tunnels [选项]\n\n选项:\n  --username <用户名>   登录用户名（必填）\n  --password <密码>     登录密码（必填）\n  --baseurl <基址>      面板地址（可选，默认 http://127.0.0.1:9200）\n  --filter <名称>       只显示指定隧道（如 ssh）\n  --json                输出原始 JSON\n  -h, --help            显示本帮助\n\n示例:\n  cpolar-tunnels --username user@example.com --password xxxx\n  cpolar-tunnels --username user@example.com --password xxxx --filter ssh\n  cpolar-tunnels --username user@example.com --password xxxx --filter ssh --json\n  cpolar-tunnels --username user@example.com --password xxxx --json\n"
+
+msgid "error: option --%s requires an argument"
+msgstr "错误: 选项 --%s 需要一个参数"
+
+msgid "error: unknown option: %s"
+msgstr "错误: 未知参数 %s"
+
+msgid "error: --username and --password are required"
+msgstr "错误: --username 和 --password 为必填参数"
+
+msgid "error: login failed, please check username and password"
+msgstr "错误: 登录失败，请检查用户名和密码"

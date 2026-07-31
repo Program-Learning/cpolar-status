@@ -1,32 +1,67 @@
 #!/usr/bin/env bash
 #
-# cpolar_tunnels.sh - 获取 cpolar 隧道信息
+# cpolar-tunnels - fetch cpolar tunnel information
 #
-# 用法:
-#   ./cpolar_tunnels.sh [选项]
+# Requires: bash, curl, jq, gettext
 #
-# 选项:
-#   --username <用户名>   登录用户名（必填）
-#   --password <密码>     登录密码（必填）
-#   --baseurl <基址>      面板地址（可选，默认 http://127.0.0.1:9200）
-#   --filter <名称>       只显示指定隧道（如 ssh）
-#   --json                输出原始 JSON
-#   -h, --help            显示本帮助
+# Usage:
+#   cpolar-tunnels [options]
 #
-# 示例:
-#   ./cpolar_tunnels.sh --username user@example.com --password xxxx
-#   ./cpolar_tunnels.sh --username user@example.com --password xxxx --filter ssh
-#   ./cpolar_tunnels.sh --username user@example.com --password xxxx --filter ssh --json
-#   ./cpolar_tunnels.sh --username user@example.com --password xxxx --json
+# Options:
+#   --username <user>    login username (required)
+#   --password <pass>    login password (required)
+#   --baseurl <url>      dashboard base URL (optional, default http://127.0.0.1:9200)
+#   --filter <name>      only show the named tunnel (e.g. ssh)
+#   --json               output raw JSON
+#   -h, --help           show this help
+#
+# i18n: uses gettext with TEXTDOMAIN=cpolar-tunnels. Language is chosen from
+# LANG/LC_ALL/LC_MESSAGES; English is the fallback when no catalog matches.
 #
 set -euo pipefail
 
-# ===================== 配置区 =====================
+# i18n setup ---------------------------------------------------------------
+export TEXTDOMAIN="${TEXTDOMAIN:-cpolar-tunnels}"
+if [[ -z "${TEXTDOMAINDIR:-}" ]]; then
+  local_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/share/locale"
+  [[ -d "$local_dir" ]] && export TEXTDOMAINDIR="$local_dir"
+fi
+_() { gettext -d "$TEXTDOMAIN" "$1"; }
+
+# ===================== config =====================
 CPOLAR_BASEURL="http://127.0.0.1:9200"
-# ===================================================
+# ==================================================
 
 usage() {
-  sed -n '2,21p' "$0"
+  printf '%s\n' "$(_ 'Usage: cpolar-tunnels [options]
+
+Options:
+  --username <user>    login username (required)
+  --password <pass>    login password (required)
+  --baseurl <url>      dashboard base URL (optional, default http://127.0.0.1:9200)
+  --filter <name>      only show the named tunnel (e.g. ssh)
+  --json               output raw JSON
+  -h, --help           show this help
+
+Examples:
+  cpolar-tunnels --username user@example.com --password xxxx
+  cpolar-tunnels --username user@example.com --password xxxx --filter ssh
+  cpolar-tunnels --username user@example.com --password xxxx --filter ssh --json
+  cpolar-tunnels --username user@example.com --password xxxx --json
+')"
+}
+
+err() { # fmt, args...
+  local fmt="$1"; shift
+  printf "$(_ "$fmt")\n" "$@" >&2
+  exit 1
+}
+
+err_usage() { # fmt, args...
+  local fmt="$1"; shift
+  printf "$(_ "$fmt")\n" "$@" >&2
+  usage >&2
+  exit 1
 }
 
 username=""
@@ -38,19 +73,19 @@ json_output=0
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --username)
-      [[ $# -ge 2 ]] || { echo "错误: --username 需要一个参数" >&2; exit 1; }
+      [[ $# -ge 2 ]] || err 'error: option --%s requires an argument' 'username'
       username="$2"; shift 2
       ;;
     --password)
-      [[ $# -ge 2 ]] || { echo "错误: --password 需要一个参数" >&2; exit 1; }
+      [[ $# -ge 2 ]] || err 'error: option --%s requires an argument' 'password'
       password="$2"; shift 2
       ;;
     --baseurl)
-      [[ $# -ge 2 ]] || { echo "错误: --baseurl 需要一个参数" >&2; exit 1; }
+      [[ $# -ge 2 ]] || err 'error: option --%s requires an argument' 'baseurl'
       baseurl="$2"; shift 2
       ;;
     --filter)
-      [[ $# -ge 2 ]] || { echo "错误: --filter 需要一个参数" >&2; exit 1; }
+      [[ $# -ge 2 ]] || err 'error: option --%s requires an argument' 'filter'
       filter="$2"; shift 2
       ;;
     --json)
@@ -60,9 +95,7 @@ while [[ $# -gt 0 ]]; do
       usage; exit 0
       ;;
     *)
-      echo "错误: 未知参数 $1" >&2
-      usage >&2
-      exit 1
+      err_usage 'error: unknown option: %s' "$1"
       ;;
   esac
 done
@@ -70,9 +103,7 @@ done
 baseurl="${baseurl:-$CPOLAR_BASEURL}"
 
 if [[ -z "$username" || -z "$password" ]]; then
-  echo "错误: --username 和 --password 为必填参数" >&2
-  usage >&2
-  exit 1
+  err_usage 'error: --username and --password are required'
 fi
 
 _login() {
@@ -97,10 +128,7 @@ _login() {
 
 _fetch_tunnels() {
   local token
-  token=$(_login) || {
-    echo "错误: 登录失败，请检查用户名和密码" >&2
-    exit 1
-  }
+  token=$(_login) || err 'error: login failed, please check username and password'
   curl -s "$baseurl/api/v1/tunnels" \
     -H "Authorization: Bearer $token"
 }
