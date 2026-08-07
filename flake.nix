@@ -21,6 +21,8 @@
             version = "0.1.0";
             src = self;
 
+            meta.mainProgram = "cpolar-status";
+
             nativeBuildInputs = [ pkgs.makeWrapper pkgs.gettext ];
             buildInputs = [ pkgs.bash pkgs.jq pkgs.curl pkgs.gettext ];
 
